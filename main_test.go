@@ -268,6 +268,31 @@ func TestReverseChronologicalOrder(t *testing.T) {
 	}
 }
 
+func TestParseFeedWithLink(t *testing.T) {
+	xmlData := `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<channel>
+	<item>
+		<title>Test Feature</title>
+		<link>https://github.blog/changelog/2026-01-20-test-feature/</link>
+		<pubDate>Mon, 20 Jan 2026 10:00:00 +0000</pubDate>
+		<description>Test description</description>
+		<content:encoded><![CDATA[<p>Test content.</p>]]></content:encoded>
+	</item>
+</channel>
+</rss>`
+
+	items, err := parseFeed([]byte(xmlData))
+	if err != nil {
+		t.Fatalf("Failed to parse feed: %v", err)
+	}
+
+	if len(items) != 1 {
+		t.Fatalf("Expected 1 item, got %d", len(items))
+	}
+
+	if items[0].Link != "https://github.blog/changelog/2026-01-20-test-feature/" {
+		t.Errorf("Expected link to be 'https://github.blog/changelog/2026-01-20-test-feature/', got '%s'", items[0].Link)
 func TestViewItem(t *testing.T) {
 	item := Item{
 		Title:   "Test Feature",

@@ -7,7 +7,9 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"regexp"
+	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -27,6 +29,7 @@ type Channel struct {
 
 type Item struct {
 	Title       string `xml:"title"`
+	Link        string `xml:"link"`
 	PubDate     string `xml:"pubDate"`
 	Description string `xml:"description"`
 	Content     string `xml:"http://purl.org/rss/1.0/modules/content/ encoded"`
@@ -42,6 +45,15 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Check if "open" command with an ID is provided
+	args := flag.Args()
+	if len(args) > 0 && args[0] == "open" {
+		if len(args) < 2 {
+			fmt.Fprintf(os.Stderr, "Usage: gh changelog open <id>\n")
+			fmt.Fprintf(os.Stderr, "Example: gh changelog open #0 or gh changelog open 0\n")
+			os.Exit(1)
+		}
+		openItem(items, args[1])
 	// Check if we have a "view" subcommand
 	args := flag.Args()
 	if len(args) > 0 && args[0] == "view" {
@@ -318,4 +330,47 @@ func decodeHTMLEntities(s string) string {
 	}
 
 	return s
+}
+
+func openItem(items []Item, idArg string) {
+	// Parse the ID from the argument (e.g., "#0" or "0")
+	idArg = strings.TrimPrefix(idArg, "#")
+	id, err := strconv.Atoi(idArg)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Invalid ID: %s\n", idArg)
+		os.Exit(1)
+	}
+
+	// Check if ID is within bounds
+	if id < 0 || id >= len(items) {
+		fmt.Fprintf(os.Stderr, "ID #%d is out of range (0-%d)\n", id, len(items)-1)
+		os.Exit(1)
+	}
+
+	// Get the item's link
+	item := items[id]
+	if item.Link == "" {
+		fmt.Fprintf(os.Stderr, "No link available for item #%d\n", id)
+		os.Exit(1)
+	}
+
+	fmt.Printf("Opening: %s\n", item.Title)
+
+	// Open the link in the default browser
+	var cmd *exec.Cmd
+	switch runtime.GOOS {
+	case "darwin":
+		cmd = exec.Command("open", item.Link)
+	case "windows":
+		// Use rundll32 to avoid command injection issues with start
+		cmd = exec.Command("rundll32", "url.dll,FileProtocolHandler", item.Link)
+	default: // Linux and other Unix-like systems
+		cmd = exec.Command("xdg-open", item.Link)
+	}
+
+	// Use Start() to avoid blocking while browser is open
+	if err := cmd.Start(); err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to open browser: %v\n", err)
+		os.Exit(1)
+	}
 }

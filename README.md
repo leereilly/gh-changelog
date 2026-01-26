@@ -17,6 +17,9 @@ gh changelog
 # Show full content with formatted body
 gh changelog --pretty
 
+# Open a specific changelog entry in your browser
+gh changelog open #0
+gh changelog open 0
 # View a specific changelog entry by ID (with HTML stripped)
 gh changelog view #0
 ```
@@ -43,6 +46,11 @@ formatted content and bullet points.
 Details about the security update...
 ```
 
+Opening a changelog entry:
+```sh
+$ gh changelog open #0
+Opening: New feature announcement
+# Opens https://github.blog/changelog/... in your default browser
 View a specific entry (HTML stripped):
 ```
 New feature announcement
