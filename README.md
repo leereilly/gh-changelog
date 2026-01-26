@@ -16,15 +16,19 @@ gh changelog
 
 # Show full content with formatted body
 gh changelog --pretty
+
+# View a specific changelog entry by ID (with HTML stripped)
+gh changelog view #0
 ```
 
 ### Example Output
 
 Default output:
 ```
-2026-01-22  New feature announcement
-2026-01-21  Security update released
-2026-01-20  API improvements
+ID      TITLE                                                                                       UPDATED
+#0      New feature announcement                                                                    Today
+#1      Security update released                                                                    1 day ago
+#2      API improvements                                                                            2 days ago
 ```
 
 With `--pretty`:
@@ -37,6 +41,17 @@ formatted content and bullet points.
 2026-01-21 - Security update released
 ----------------------------------------
 Details about the security update...
+```
+
+View a specific entry (HTML stripped):
+```
+New feature announcement
+------------------------
+
+Published: 2026-01-22
+
+Full description of the feature with
+formatted content and bullet points.
 ```
 
 ## Development

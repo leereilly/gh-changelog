@@ -41,6 +41,33 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Check if we have a "view" subcommand
+	args := flag.Args()
+	if len(args) > 0 && args[0] == "view" {
+		if len(args) < 2 {
+			fmt.Fprintf(os.Stderr, "Error: view command requires an ID argument (e.g., view #0)\n")
+			os.Exit(1)
+		}
+		
+		// Parse the ID (handle both "#0" and "0" formats)
+		idStr := strings.TrimPrefix(args[1], "#")
+		var id int
+		_, err := fmt.Sscanf(idStr, "%d", &id)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: invalid ID format '%s'\n", args[1])
+			os.Exit(1)
+		}
+		
+		if id < 0 || id >= len(items) {
+			fmt.Fprintf(os.Stderr, "Error: ID %d is out of range (0-%d)\n", id, len(items)-1)
+			os.Exit(1)
+		}
+		
+		output := viewItem(items[id])
+		fmt.Print(output)
+		return
+	}
+
 	output := formatItems(items, *pretty)
 	fmt.Print(output)
 }
@@ -116,6 +143,32 @@ func formatRelativeDate(dateStr string) string {
 	} else {
 		return fmt.Sprintf("%d days ago", days)
 	}
+}
+
+func viewItem(item Item) string {
+	var sb strings.Builder
+	
+	// Display title
+	sb.WriteString(item.Title)
+	sb.WriteString("\n")
+	sb.WriteString(strings.Repeat("-", len(item.Title)))
+	sb.WriteString("\n\n")
+	
+	// Display date
+	date := formatDate(item.PubDate)
+	sb.WriteString("Published: ")
+	sb.WriteString(date)
+	sb.WriteString("\n\n")
+	
+	// Display content with HTML stripped
+	content := item.Content
+	if content == "" {
+		content = item.Description
+	}
+	sb.WriteString(htmlToText(content))
+	sb.WriteString("\n")
+	
+	return sb.String()
 }
 
 func formatItems(items []Item, pretty bool) string {

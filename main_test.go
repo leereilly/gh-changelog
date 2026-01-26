@@ -267,3 +267,42 @@ func TestReverseChronologicalOrder(t *testing.T) {
 		}
 	}
 }
+
+func TestViewItem(t *testing.T) {
+	item := Item{
+		Title:   "Test Feature",
+		PubDate: "Tue, 21 Jan 2026 12:00:00 +0000",
+		Content: "<p>This is <strong>bold</strong> content.</p><p>Second paragraph with <a href='http://example.com'>a link</a>.</p>",
+	}
+
+	output := viewItem(item)
+
+	// Should contain the title
+	if !strings.Contains(output, "Test Feature") {
+		t.Errorf("Expected output to contain title, got:\n%s", output)
+	}
+
+	// Should contain the date
+	if !strings.Contains(output, "2026-01-21") {
+		t.Errorf("Expected output to contain date, got:\n%s", output)
+	}
+
+	// Should contain the content text
+	if !strings.Contains(output, "This is bold content.") {
+		t.Errorf("Expected output to contain stripped text, got:\n%s", output)
+	}
+
+	// Should NOT contain HTML tags
+	if strings.Contains(output, "<p>") || strings.Contains(output, "<strong>") || strings.Contains(output, "<a") {
+		t.Errorf("Expected no HTML tags in output, got:\n%s", output)
+	}
+
+	// Should contain link text but not href
+	if !strings.Contains(output, "a link") {
+		t.Errorf("Expected output to contain link text, got:\n%s", output)
+	}
+
+	if strings.Contains(output, "http://example.com") {
+		t.Errorf("Expected output to not contain href, got:\n%s", output)
+	}
+}
