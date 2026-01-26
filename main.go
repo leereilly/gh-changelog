@@ -9,6 +9,7 @@ import (
 	"os"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -48,21 +49,20 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Error: view command requires an ID argument (e.g., view #0)\n")
 			os.Exit(1)
 		}
-		
+
 		// Parse the ID (handle both "#0" and "0" formats)
 		idStr := strings.TrimPrefix(args[1], "#")
-		var id int
-		_, err := fmt.Sscanf(idStr, "%d", &id)
+		id, err := strconv.Atoi(idStr)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: invalid ID format '%s'\n", args[1])
 			os.Exit(1)
 		}
-		
+
 		if id < 0 || id >= len(items) {
 			fmt.Fprintf(os.Stderr, "Error: ID %d is out of range (0-%d)\n", id, len(items)-1)
 			os.Exit(1)
 		}
-		
+
 		output := viewItem(items[id])
 		fmt.Print(output)
 		return
@@ -147,19 +147,19 @@ func formatRelativeDate(dateStr string) string {
 
 func viewItem(item Item) string {
 	var sb strings.Builder
-	
+
 	// Display title
 	sb.WriteString(item.Title)
 	sb.WriteString("\n")
 	sb.WriteString(strings.Repeat("-", len(item.Title)))
 	sb.WriteString("\n\n")
-	
+
 	// Display date
 	date := formatDate(item.PubDate)
 	sb.WriteString("Published: ")
 	sb.WriteString(date)
 	sb.WriteString("\n\n")
-	
+
 	// Display content with HTML stripped
 	content := item.Content
 	if content == "" {
@@ -167,7 +167,7 @@ func viewItem(item Item) string {
 	}
 	sb.WriteString(htmlToText(content))
 	sb.WriteString("\n")
-	
+
 	return sb.String()
 }
 
