@@ -54,8 +54,10 @@ func main() {
 			os.Exit(1)
 		}
 		openItem(items, args[1])
+		return
+	}
+
 	// Check if we have a "view" subcommand
-	args := flag.Args()
 	if len(args) > 0 && args[0] == "view" {
 		if len(args) < 2 {
 			fmt.Fprintf(os.Stderr, "Error: view command requires an ID argument (e.g., view #0)\n")
