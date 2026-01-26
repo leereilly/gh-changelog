@@ -97,7 +97,10 @@ func formatRelativeDate(dateStr string) string {
 	}
 	
 	now := time.Now()
-	days := int(now.Sub(t).Hours() / 24)
+	// Truncate to start of day for accurate day counting
+	nowDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	tDay := time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
+	days := int(nowDay.Sub(tDay).Hours() / 24)
 	
 	if days == 0 {
 		return "0 days ago"

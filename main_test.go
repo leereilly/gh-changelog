@@ -78,8 +78,9 @@ func TestFormatRelativeDate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Create a date string for the specified number of days ago
-			testDate := now.Add(-time.Duration(tt.daysAgo) * 24 * time.Hour)
+			// Create a date at the start of the day for the specified number of days ago
+			nowDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+			testDate := nowDay.Add(-time.Duration(tt.daysAgo) * 24 * time.Hour)
 			dateStr := testDate.Format(time.RFC1123Z)
 			
 			result := formatRelativeDate(dateStr)
