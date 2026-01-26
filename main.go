@@ -122,10 +122,11 @@ func formatItems(items []Item, pretty bool) string {
 	var sb strings.Builder
 
 	if !pretty {
-		// Add headers for default format
-		// Column order: TITLE (left), UPDATED (middle), ID (right, cyan colored)
-		sb.WriteString("TITLE                                                         UPDATED          ID\n")
-		sb.WriteString("-----                                                         -------          --\n")
+		// Add headers for default format with ANSI underline styling (like gh issue list)
+		// Column order: ID (left), TITLE (middle), UPDATED (right)
+		underline := "\033[4m"
+		reset := "\033[0m"
+		sb.WriteString(fmt.Sprintf("%s%-6s%s  %s%-90s%s  %s%s%s\n", underline, "ID", reset, underline, "TITLE", reset, underline, "UPDATED", reset))
 	}
 
 	for i, item := range items {
@@ -145,12 +146,24 @@ func formatItems(items []Item, pretty bool) string {
 			}
 		} else {
 			relativeDate := formatRelativeDate(item.PubDate)
-			// ANSI color code for cyan (same as gh issue list)
-			cyan := "\033[36m"
+			// ANSI color code for green (same as gh issue list)
+			green := "\033[32m"
 			reset := "\033[0m"
-			coloredID := fmt.Sprintf("%s#%d%s", cyan, i, reset)
-			// Format: Title (left-aligned, 60 chars), Updated (left-aligned, 16 chars), ID (colored)
-			sb.WriteString(fmt.Sprintf("%-60s %-16s %s\n", item.Title, relativeDate, coloredID))
+			// Format ID without color for width calculation, then add color
+			idStr := fmt.Sprintf("#%d", i)
+			coloredID := fmt.Sprintf("%s%s%s", green, idStr, reset)
+			// Pad the colored ID manually since ANSI codes affect string length
+			padding := 6 - len(idStr)
+			if padding > 0 {
+				coloredID = coloredID + strings.Repeat(" ", padding)
+			}
+			// Truncate title if it exceeds 90 characters
+			title := item.Title
+			if len(title) > 90 {
+				title = title[:87] + "..."
+			}
+			// Format: ID (colored, 6 chars), Title (90 chars), Updated
+			sb.WriteString(fmt.Sprintf("%s  %-90s  %s\n", coloredID, title, relativeDate))
 		}
 	}
 
