@@ -66,21 +66,22 @@ func TestFormatRelativeDate(t *testing.T) {
 	now := time.Now()
 	
 	tests := []struct {
-		name     string
-		daysAgo  int
-		expected string
+		name        string
+		timeAgo     time.Duration
+		expected    string
 	}{
-		{"today", 0, "0 days ago"},
-		{"yesterday", 1, "1 day ago"},
-		{"two days ago", 2, "2 days ago"},
-		{"seven days ago", 7, "7 days ago"},
+		{"just now - 30 minutes ago", 30 * time.Minute, "Just now"},
+		{"just now - 59 minutes ago", 59 * time.Minute, "Just now"},
+		{"today - 2 hours ago", 2 * time.Hour, "Today"},
+		{"today - 10 hours ago", 10 * time.Hour, "Today"},
+		{"yesterday", 25 * time.Hour, "1 day ago"},
+		{"two days ago", 2 * 24 * time.Hour, "2 days ago"},
+		{"seven days ago", 7 * 24 * time.Hour, "7 days ago"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Create a date at the start of the day for the specified number of days ago
-			nowDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
-			testDate := nowDay.Add(-time.Duration(tt.daysAgo) * 24 * time.Hour)
+			testDate := now.Add(-tt.timeAgo)
 			dateStr := testDate.Format(time.RFC1123Z)
 			
 			result := formatRelativeDate(dateStr)
@@ -104,7 +105,7 @@ func TestFormatItemsDefault(t *testing.T) {
 		t.Errorf("Expected output to contain header 'ID  DATE            TITLE', got:\n%s", output)
 	}
 
-	if !strings.Contains(output, "==  ====            =====") {
+	if !strings.Contains(output, "--  ----            -----") {
 		t.Errorf("Expected output to contain header underline, got:\n%s", output)
 	}
 

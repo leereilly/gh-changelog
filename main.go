@@ -97,13 +97,20 @@ func formatRelativeDate(dateStr string) string {
 	}
 	
 	now := time.Now()
+	duration := now.Sub(t)
+	
+	// Less than 60 minutes
+	if duration < 60*time.Minute {
+		return "Just now"
+	}
+	
 	// Truncate to start of day for accurate day counting
 	nowDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 	tDay := time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
 	days := int(nowDay.Sub(tDay).Hours() / 24)
 	
 	if days == 0 {
-		return "0 days ago"
+		return "Today"
 	} else if days == 1 {
 		return "1 day ago"
 	} else {
@@ -117,7 +124,7 @@ func formatItems(items []Item, pretty bool) string {
 	if !pretty {
 		// Add headers for default format
 		sb.WriteString("ID  DATE            TITLE\n")
-		sb.WriteString("==  ====            =====\n")
+		sb.WriteString("--  ----            -----\n")
 	}
 
 	for i, item := range items {
