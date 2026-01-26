@@ -16,15 +16,20 @@ gh changelog
 
 # Show full content with formatted body
 gh changelog --pretty
+
+# Open a specific changelog entry in your browser
+gh changelog open #0
+gh changelog open 0
 ```
 
 ### Example Output
 
 Default output:
 ```
-2026-01-22  New feature announcement
-2026-01-21  Security update released
-2026-01-20  API improvements
+ID      TITLE                                                                                       UPDATED
+#0      New feature announcement                                                                    Today
+#1      Security update released                                                                    1 day ago
+#2      API improvements                                                                            2 days ago
 ```
 
 With `--pretty`:
@@ -37,6 +42,13 @@ formatted content and bullet points.
 2026-01-21 - Security update released
 ----------------------------------------
 Details about the security update...
+```
+
+Opening a changelog entry:
+```sh
+$ gh changelog open #0
+Opening: New feature announcement
+# Opens https://github.blog/changelog/... in your default browser
 ```
 
 ## Development
