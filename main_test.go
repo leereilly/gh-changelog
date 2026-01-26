@@ -100,22 +100,31 @@ func TestFormatItemsDefault(t *testing.T) {
 
 	output := formatItems(items, false)
 
-	// Check for headers
-	if !strings.Contains(output, "ID  DATE            TITLE") {
-		t.Errorf("Expected output to contain header 'ID  DATE            TITLE', got:\n%s", output)
+	// Check for headers (new format: TITLE, UPDATED, ID)
+	if !strings.Contains(output, "TITLE") {
+		t.Errorf("Expected output to contain header 'TITLE', got:\n%s", output)
 	}
 
-	if !strings.Contains(output, "--  ----            -----") {
+	if !strings.Contains(output, "UPDATED") {
+		t.Errorf("Expected output to contain header 'UPDATED', got:\n%s", output)
+	}
+
+	if !strings.Contains(output, "ID") {
+		t.Errorf("Expected output to contain header 'ID', got:\n%s", output)
+	}
+
+	// Check for header underlines
+	if !strings.Contains(output, "-----") {
 		t.Errorf("Expected output to contain header underline, got:\n%s", output)
 	}
 
-	// Check for ID column (0 for first item, 1 for second item)
-	if !strings.Contains(output, "0   ") {
-		t.Errorf("Expected output to contain ID '0', got:\n%s", output)
+	// Check for ID column with # prefix (0 for first item, 1 for second item)
+	if !strings.Contains(output, "#0") {
+		t.Errorf("Expected output to contain ID '#0', got:\n%s", output)
 	}
 
-	if !strings.Contains(output, "1   ") {
-		t.Errorf("Expected output to contain ID '1', got:\n%s", output)
+	if !strings.Contains(output, "#1") {
+		t.Errorf("Expected output to contain ID '#1', got:\n%s", output)
 	}
 
 	// Check for feature titles

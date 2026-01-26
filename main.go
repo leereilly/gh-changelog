@@ -123,8 +123,9 @@ func formatItems(items []Item, pretty bool) string {
 
 	if !pretty {
 		// Add headers for default format
-		sb.WriteString("ID  DATE            TITLE\n")
-		sb.WriteString("--  ----            -----\n")
+		// Column order: TITLE, UPDATED, ID (on the left with color)
+		sb.WriteString("TITLE                                                         UPDATED          ID\n")
+		sb.WriteString("-----                                                         -------          --\n")
 	}
 
 	for i, item := range items {
@@ -144,7 +145,12 @@ func formatItems(items []Item, pretty bool) string {
 			}
 		} else {
 			relativeDate := formatRelativeDate(item.PubDate)
-			sb.WriteString(fmt.Sprintf("%-3d %-15s %s\n", i, relativeDate, item.Title))
+			// ANSI color code for cyan (same as gh issue list)
+			cyan := "\033[36m"
+			reset := "\033[0m"
+			coloredID := fmt.Sprintf("%s#%d%s", cyan, i, reset)
+			// Format: Title (left-aligned, 60 chars), Updated (left-aligned, 16 chars), ID (colored)
+			sb.WriteString(fmt.Sprintf("%-60s %-16s %s\n", item.Title, relativeDate, coloredID))
 		}
 	}
 
