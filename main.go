@@ -49,7 +49,8 @@ func main() {
 	args := flag.Args()
 	if len(args) > 0 && args[0] == "open" {
 		if len(args) < 2 {
-			fmt.Fprintf(os.Stderr, "Usage: gh changelog open #<id>\n")
+			fmt.Fprintf(os.Stderr, "Usage: gh changelog open <id>\n")
+			fmt.Fprintf(os.Stderr, "Example: gh changelog open #0 or gh changelog open 0\n")
 			os.Exit(1)
 		}
 		openItem(items, args[1])
@@ -317,8 +318,8 @@ func openItem(items []Item, idArg string) {
 		cmd = exec.Command("xdg-open", item.Link)
 	}
 
-	// Use Run() to wait for the command to complete and avoid zombie processes
-	if err := cmd.Run(); err != nil {
+	// Use Start() to avoid blocking while browser is open
+	if err := cmd.Start(); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to open browser: %v\n", err)
 		os.Exit(1)
 	}
