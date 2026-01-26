@@ -309,12 +309,14 @@ func openItem(items []Item, idArg string) {
 	case "darwin":
 		cmd = exec.Command("open", item.Link)
 	case "windows":
-		cmd = exec.Command("cmd", "/c", "start", item.Link)
+		// Use rundll32 to avoid command injection issues with start
+		cmd = exec.Command("rundll32", "url.dll,FileProtocolHandler", item.Link)
 	default: // Linux and other Unix-like systems
 		cmd = exec.Command("xdg-open", item.Link)
 	}
 
-	if err := cmd.Start(); err != nil {
+	// Use Run() to wait for the command to complete and avoid zombie processes
+	if err := cmd.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to open browser: %v\n", err)
 		os.Exit(1)
 	}
