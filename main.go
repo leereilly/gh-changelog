@@ -90,8 +90,32 @@ func formatDate(dateStr string) string {
 	return t.Format("2006-01-02")
 }
 
+func formatRelativeDate(dateStr string) string {
+	t, err := parseDate(dateStr)
+	if err != nil {
+		return dateStr
+	}
+	
+	now := time.Now()
+	days := int(now.Sub(t).Hours() / 24)
+	
+	if days == 0 {
+		return "0 days ago"
+	} else if days == 1 {
+		return "1 day ago"
+	} else {
+		return fmt.Sprintf("%d days ago", days)
+	}
+}
+
 func formatItems(items []Item, pretty bool) string {
 	var sb strings.Builder
+
+	if !pretty {
+		// Add headers for default format
+		sb.WriteString("ID  DATE            TITLE\n")
+		sb.WriteString("==  ====            =====\n")
+	}
 
 	for i, item := range items {
 		date := formatDate(item.PubDate)
@@ -109,7 +133,8 @@ func formatItems(items []Item, pretty bool) string {
 				sb.WriteString("\n")
 			}
 		} else {
-			sb.WriteString(fmt.Sprintf("%s  %s\n", date, item.Title))
+			relativeDate := formatRelativeDate(item.PubDate)
+			sb.WriteString(fmt.Sprintf("%-3d %-15s %s\n", i, relativeDate, item.Title))
 		}
 	}
 

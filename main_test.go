@@ -3,6 +3,7 @@ package main
 import (
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestParseFeed(t *testing.T) {
@@ -61,6 +62,34 @@ func TestFormatDate(t *testing.T) {
 	}
 }
 
+func TestFormatRelativeDate(t *testing.T) {
+	now := time.Now()
+	
+	tests := []struct {
+		name     string
+		daysAgo  int
+		expected string
+	}{
+		{"today", 0, "0 days ago"},
+		{"yesterday", 1, "1 day ago"},
+		{"two days ago", 2, "2 days ago"},
+		{"seven days ago", 7, "7 days ago"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create a date string for the specified number of days ago
+			testDate := now.Add(-time.Duration(tt.daysAgo) * 24 * time.Hour)
+			dateStr := testDate.Format(time.RFC1123Z)
+			
+			result := formatRelativeDate(dateStr)
+			if result != tt.expected {
+				t.Errorf("formatRelativeDate(%q) = %q, want %q", dateStr, result, tt.expected)
+			}
+		})
+	}
+}
+
 func TestFormatItemsDefault(t *testing.T) {
 	items := []Item{
 		{Title: "Feature A", PubDate: "Tue, 21 Jan 2026 12:00:00 +0000"},
@@ -69,12 +98,31 @@ func TestFormatItemsDefault(t *testing.T) {
 
 	output := formatItems(items, false)
 
-	if !strings.Contains(output, "2026-01-21  Feature A") {
-		t.Errorf("Expected output to contain '2026-01-21  Feature A', got:\n%s", output)
+	// Check for headers
+	if !strings.Contains(output, "ID  DATE            TITLE") {
+		t.Errorf("Expected output to contain header 'ID  DATE            TITLE', got:\n%s", output)
 	}
 
-	if !strings.Contains(output, "2026-01-20  Feature B") {
-		t.Errorf("Expected output to contain '2026-01-20  Feature B', got:\n%s", output)
+	if !strings.Contains(output, "==  ====            =====") {
+		t.Errorf("Expected output to contain header underline, got:\n%s", output)
+	}
+
+	// Check for ID column (0 for first item, 1 for second item)
+	if !strings.Contains(output, "0   ") {
+		t.Errorf("Expected output to contain ID '0', got:\n%s", output)
+	}
+
+	if !strings.Contains(output, "1   ") {
+		t.Errorf("Expected output to contain ID '1', got:\n%s", output)
+	}
+
+	// Check for feature titles
+	if !strings.Contains(output, "Feature A") {
+		t.Errorf("Expected output to contain 'Feature A', got:\n%s", output)
+	}
+
+	if !strings.Contains(output, "Feature B") {
+		t.Errorf("Expected output to contain 'Feature B', got:\n%s", output)
 	}
 }
 
