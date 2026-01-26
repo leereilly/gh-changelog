@@ -3,6 +3,7 @@ package main
 import (
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestParseFeed(t *testing.T) {
@@ -61,6 +62,36 @@ func TestFormatDate(t *testing.T) {
 	}
 }
 
+func TestFormatRelativeDate(t *testing.T) {
+	now := time.Now()
+	
+	tests := []struct {
+		name        string
+		timeAgo     time.Duration
+		expected    string
+	}{
+		{"just now - 30 minutes ago", 30 * time.Minute, "Just now"},
+		{"just now - 59 minutes ago", 59 * time.Minute, "Just now"},
+		{"today - 2 hours ago", 2 * time.Hour, "Today"},
+		{"today - 10 hours ago", 10 * time.Hour, "Today"},
+		{"yesterday", 25 * time.Hour, "1 day ago"},
+		{"two days ago", 2 * 24 * time.Hour, "2 days ago"},
+		{"seven days ago", 7 * 24 * time.Hour, "7 days ago"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			testDate := now.Add(-tt.timeAgo)
+			dateStr := testDate.Format(time.RFC1123Z)
+			
+			result := formatRelativeDate(dateStr)
+			if result != tt.expected {
+				t.Errorf("formatRelativeDate(%q) = %q, want %q", dateStr, result, tt.expected)
+			}
+		})
+	}
+}
+
 func TestFormatItemsDefault(t *testing.T) {
 	items := []Item{
 		{Title: "Feature A", PubDate: "Tue, 21 Jan 2026 12:00:00 +0000"},
@@ -69,12 +100,40 @@ func TestFormatItemsDefault(t *testing.T) {
 
 	output := formatItems(items, false)
 
-	if !strings.Contains(output, "2026-01-21  Feature A") {
-		t.Errorf("Expected output to contain '2026-01-21  Feature A', got:\n%s", output)
+	// Check for headers (new format: TITLE, UPDATED, ID)
+	if !strings.Contains(output, "TITLE") {
+		t.Errorf("Expected output to contain header 'TITLE', got:\n%s", output)
 	}
 
-	if !strings.Contains(output, "2026-01-20  Feature B") {
-		t.Errorf("Expected output to contain '2026-01-20  Feature B', got:\n%s", output)
+	if !strings.Contains(output, "UPDATED") {
+		t.Errorf("Expected output to contain header 'UPDATED', got:\n%s", output)
+	}
+
+	if !strings.Contains(output, "ID") {
+		t.Errorf("Expected output to contain header 'ID', got:\n%s", output)
+	}
+
+	// Check for header underlines
+	if !strings.Contains(output, "-----") {
+		t.Errorf("Expected output to contain header underline, got:\n%s", output)
+	}
+
+	// Check for ID column with # prefix (0 for first item, 1 for second item)
+	if !strings.Contains(output, "#0") {
+		t.Errorf("Expected output to contain ID '#0', got:\n%s", output)
+	}
+
+	if !strings.Contains(output, "#1") {
+		t.Errorf("Expected output to contain ID '#1', got:\n%s", output)
+	}
+
+	// Check for feature titles
+	if !strings.Contains(output, "Feature A") {
+		t.Errorf("Expected output to contain 'Feature A', got:\n%s", output)
+	}
+
+	if !strings.Contains(output, "Feature B") {
+		t.Errorf("Expected output to contain 'Feature B', got:\n%s", output)
 	}
 }
 

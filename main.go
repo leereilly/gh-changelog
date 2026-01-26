@@ -90,8 +90,44 @@ func formatDate(dateStr string) string {
 	return t.Format("2006-01-02")
 }
 
+func formatRelativeDate(dateStr string) string {
+	t, err := parseDate(dateStr)
+	if err != nil {
+		return dateStr
+	}
+	
+	now := time.Now()
+	duration := now.Sub(t)
+	
+	// Less than 60 minutes
+	if duration < 60*time.Minute {
+		return "Just now"
+	}
+	
+	// Truncate to start of day for accurate day counting
+	nowDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	tDay := time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
+	days := int(nowDay.Sub(tDay).Hours() / 24)
+	
+	if days == 0 {
+		return "Today"
+	} else if days == 1 {
+		return "1 day ago"
+	} else {
+		return fmt.Sprintf("%d days ago", days)
+	}
+}
+
 func formatItems(items []Item, pretty bool) string {
 	var sb strings.Builder
+
+	if !pretty {
+		// Add headers for default format with ANSI underline styling (like gh issue list)
+		// Column order: ID (left), TITLE (middle), UPDATED (right)
+		underline := "\033[4m"
+		reset := "\033[0m"
+		sb.WriteString(fmt.Sprintf("%s%-6s%s  %s%-90s%s  %s%s%s\n", underline, "ID", reset, underline, "TITLE", reset, underline, "UPDATED", reset))
+	}
 
 	for i, item := range items {
 		date := formatDate(item.PubDate)
@@ -109,7 +145,25 @@ func formatItems(items []Item, pretty bool) string {
 				sb.WriteString("\n")
 			}
 		} else {
-			sb.WriteString(fmt.Sprintf("%s  %s\n", date, item.Title))
+			relativeDate := formatRelativeDate(item.PubDate)
+			// ANSI color code for green (same as gh issue list)
+			green := "\033[32m"
+			reset := "\033[0m"
+			// Format ID without color for width calculation, then add color
+			idStr := fmt.Sprintf("#%d", i)
+			coloredID := fmt.Sprintf("%s%s%s", green, idStr, reset)
+			// Pad the colored ID manually since ANSI codes affect string length
+			padding := 6 - len(idStr)
+			if padding > 0 {
+				coloredID = coloredID + strings.Repeat(" ", padding)
+			}
+			// Truncate title if it exceeds 90 characters
+			title := item.Title
+			if len(title) > 90 {
+				title = title[:87] + "..."
+			}
+			// Format: ID (colored, 6 chars), Title (90 chars), Updated
+			sb.WriteString(fmt.Sprintf("%s  %-90s  %s\n", coloredID, title, relativeDate))
 		}
 	}
 
