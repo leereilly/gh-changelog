@@ -123,7 +123,7 @@ func formatItems(items []Item, pretty bool) string {
 
 	if !pretty {
 		// Add headers for default format
-		// Column order: TITLE, UPDATED, ID (on the left with color)
+		// Column order: TITLE (left), UPDATED (middle), ID (right, cyan colored)
 		sb.WriteString("TITLE                                                         UPDATED          ID\n")
 		sb.WriteString("-----                                                         -------          --\n")
 	}
