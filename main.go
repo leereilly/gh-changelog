@@ -148,10 +148,11 @@ func formatRelativeDate(dateStr string) string {
 func viewItem(item Item) string {
 	var sb strings.Builder
 
-	// Display title
-	sb.WriteString(item.Title)
+	// Display title (strip any HTML that might be in it)
+	title := htmlToText(item.Title)
+	sb.WriteString(title)
 	sb.WriteString("\n")
-	sb.WriteString(strings.Repeat("-", len(item.Title)))
+	sb.WriteString(strings.Repeat("-", len(title)))
 	sb.WriteString("\n\n")
 
 	// Display date
