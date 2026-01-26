@@ -303,6 +303,8 @@ func openItem(items []Item, idArg string) {
 		os.Exit(1)
 	}
 
+	fmt.Printf("Opening: %s\n", item.Title)
+
 	// Open the link in the default browser
 	var cmd *exec.Cmd
 	switch runtime.GOOS {
@@ -320,6 +322,4 @@ func openItem(items []Item, idArg string) {
 		fmt.Fprintf(os.Stderr, "Failed to open browser: %v\n", err)
 		os.Exit(1)
 	}
-
-	fmt.Printf("Opening: %s\n", item.Title)
 }
