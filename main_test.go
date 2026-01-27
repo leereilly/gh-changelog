@@ -293,6 +293,9 @@ func TestParseFeedWithLink(t *testing.T) {
 
 	if items[0].Link != "https://github.blog/changelog/2026-01-20-test-feature/" {
 		t.Errorf("Expected link to be 'https://github.blog/changelog/2026-01-20-test-feature/', got '%s'", items[0].Link)
+	}
+}
+
 func TestViewItem(t *testing.T) {
 	item := Item{
 		Title:   "Test Feature",
