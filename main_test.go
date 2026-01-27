@@ -293,6 +293,9 @@ func TestParseFeedWithLink(t *testing.T) {
 
 	if items[0].Link != "https://github.blog/changelog/2026-01-20-test-feature/" {
 		t.Errorf("Expected link to be 'https://github.blog/changelog/2026-01-20-test-feature/', got '%s'", items[0].Link)
+	}
+}
+
 func TestViewItem(t *testing.T) {
 	item := Item{
 		Title:   "Test Feature",
@@ -329,5 +332,33 @@ func TestViewItem(t *testing.T) {
 
 	if strings.Contains(output, "http://example.com") {
 		t.Errorf("Expected output to not contain href, got:\n%s", output)
+	}
+}
+
+func TestFormatItemsLeadingNewline(t *testing.T) {
+	items := []Item{
+		{Title: "Feature A", PubDate: "Tue, 21 Jan 2026 12:00:00 +0000"},
+	}
+
+	output := formatItems(items, false)
+
+	// Check that output does NOT start with newline (formatItems itself doesn't add it)
+	if strings.HasPrefix(output, "\n") {
+		t.Errorf("formatItems should not add leading newline itself")
+	}
+}
+
+func TestViewItemLeadingNewline(t *testing.T) {
+	item := Item{
+		Title:   "Test Feature",
+		PubDate: "Tue, 21 Jan 2026 12:00:00 +0000",
+		Content: "<p>Test content</p>",
+	}
+
+	output := viewItem(item)
+
+	// Check that output does NOT start with newline (viewItem itself doesn't add it)
+	if strings.HasPrefix(output, "\n") {
+		t.Errorf("viewItem should not add leading newline itself")
 	}
 }
