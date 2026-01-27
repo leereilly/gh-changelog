@@ -78,12 +78,12 @@ func main() {
 		}
 
 		output := viewItem(items[id])
-		fmt.Print(output)
+		fmt.Print("\n" + output)
 		return
 	}
 
 	output := formatItems(items, *pretty)
-	fmt.Print(output)
+	fmt.Print("\n" + output)
 }
 
 func fetchFeed(url string) ([]Item, error) {
