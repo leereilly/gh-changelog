@@ -4,7 +4,7 @@ A GitHub CLI extension to view the latest GitHub Changelog entries directly in y
 
 ## Installation
 
-```sh
+```
 gh extension install leereilly/gh-changelog
 ```
 
@@ -12,7 +12,7 @@ gh extension install leereilly/gh-changelog
 
 ### View recent changelogs
 
-```sh
+```
 gh changelog
 ```
 
@@ -36,7 +36,7 @@ The `--pretty` flag includes the full content with HTML converted to readable pl
 
 ### View specific changelog
 
-```sh
+```
 gh changelog view 0
 ```
 
@@ -60,7 +60,7 @@ Get started today by updating your GitHub Copilot extension.
 
 ### Open specific changelog in browser
 
-```sh
+```
 gh changelog open 0
 ```
 
@@ -72,13 +72,13 @@ gh changelog open 0
 
 ### Build
 
-```sh
+```
 go build -o gh-changelog
 ```
 
 ### Test
 
-```sh
+```
 go test -v
 ```
 
