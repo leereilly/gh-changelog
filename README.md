@@ -1,6 +1,10 @@
 # gh-changelog
 
-A GitHub CLI extension to view the latest GitHub Changelog entries directly in your terminal.
+A GitHub CLI extension to view the latest [GitHub Changelog](https://github.blog/changelog/) entries directly in your terminal.
+
+Built using [GitHub Copilot CLI](https://github.com/features/copilot/cli) for the [GitHub Copilot CLI Challenge](https://dev.to/devteam/join-the-github-copilot-cli-challenge-win-github-universe-tickets-copilot-pro-subscriptions-and-50af?bb=260465).
+
+![Demo GIF](images/demo.gif)
 
 ## Installation
 
